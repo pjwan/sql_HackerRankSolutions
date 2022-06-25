@@ -80,41 +80,41 @@ If more than one hacker achieved the same total score, then sort the result by a
 Exclude all hackers with a total score of 0 from your result.
 */
 -- Subquery version
-SELECT
-    h1.hacker_id AS id,
-    h1.name AS name,
-    SUM(max_score.score) AS final_score
-FROM Hackers AS h1
+SELECT 
+    t1.hacker_id AS hacker_id,
+    t1.name AS name,
+    SUM(t2.max_score) AS total_score
+FROM Hackers as t1
 INNER JOIN (
     SELECT 
         hacker_id,
-        MAX(score) AS score
+        MAX(score) as max_score
     FROM Submissions
     GROUP BY hacker_id, challenge_id
-    ) AS max_score
-ON h1.hacker_id = max_score.hacker_id
-GROUP BY id, name
-HAVING final_score != 0
-ORDER BY final_score DESC, id;
+    ) AS t2
+ON t1.hacker_id = t2.hacker_id
+GROUP BY t1.hacker_id, t1.name
+HAVING total_score != 0
+ORDER BY total_score DESC, hacker_id;
 -- CTE version
-WITH a AS (
+WITH t1 AS (
     SELECT 
         hacker_id,
         name,
         MAX(score) AS score
     FROM Submissions
     GROUP BY hacker_id, challenge_id),
-    b AS (
+    t2 AS (
         SELECT 
             score AS total_score
-        FROM a
+        FROM t1
     )
 SELECT 
     hacker_id,
     name,
     SUM(score) AS total_score
-FROM a,b
-WHERE b.total_score 1 != 0
+FROM t1, t2
+WHERE t2.total_score 1 != 0
 ORDER BY total_score DESC, hacker_id;
 
 
