@@ -1,9 +1,7 @@
 
 /*
-1.
- If more than one student created the same number of challenges 
- and the count is less than the maximum number of challenges created, 
- then exclude those students from the result.
+1.If more than one student created the same number of challenges and the count is less than the maximum number of challenges created, 
+then exclude those students from the result.
 */ 
 -- CTE version
 WITH cte AS (
@@ -13,7 +11,7 @@ SELECT
     COUNT(*) AS frequency
 FROM Hackers AS H
 INNER JOIN Challenges AS C
-ON H.hacker_id = C.hacker_id
+ ON H.hacker_id = C.hacker_id
 GROUP BY 1,2
 )
 SELECT 
@@ -41,7 +39,7 @@ SELECT
     COUNT(*) AS freq
 FROM Hackers AS H
 INNER JOIN Challenges AS C
-ON H.hacker_id = C.hacker_id
+ ON H.hacker_id = C.hacker_id
 GROUP BY id, name
 HAVING 
     freq IN (
@@ -52,7 +50,7 @@ HAVING
                 COUNT(*) AS freq1
             FROM Hackers AS H1
             INNER JOIN Challenges AS C1
-            ON H1.hacker_id = C1.hacker_id 
+             ON H1.hacker_id = C1.hacker_id 
             GROUP BY H1.hacker_id
             ) AS tb_1
         GROUP BY tb_1.freq1
@@ -66,15 +64,14 @@ HAVING
                 COUNT(*) as freq2
             FROM Hackers AS H2
             INNER JOIN Challenges AS C2
-            ON H2.hacker_id = C2.hacker_id 
+             ON H2.hacker_id = C2.hacker_id 
             GROUP BY H2.hacker_id
             ) AS tb_2
         )
 ORDER BY freq DESC, id;
 
 /*
-2.
-The total score of a hacker is the sum of their maximum scores for all of the challenges. 
+2. The total score of a hacker is the sum of their maximum scores for all of the challenges. 
 Write a query to print the hacker_id, name, and total score of the hackers ordered by the descending score. 
 If more than one hacker achieved the same total score, then sort the result by ascending hacker_id. 
 Exclude all hackers with a total score of 0 from your result.
@@ -117,8 +114,9 @@ FROM t1, t2
 WHERE t2.total_score 1 != 0
 ORDER BY total_score DESC, hacker_id;
 
-/* 3.  Write a query to print the respective hacker_id and name of hackers who achieved full scores for more than one challenge. 
-Order your output in descending order by the total number of challenges in which the hacker earned a full score. If more than one hacker received full scores in same number of challenges, then sort them by ascending hacker_id.
+/* 3. Write a query to print the respective hacker_id and name of hackers who achieved full scores for more than one challenge. 
+Order your output in descending order by the total number of challenges in which the hacker earned a full score. 
+If more than one hacker received full scores in same number of challenges, then sort them by ascending hacker_id.
 */
 -- subquery version
 SELECT 
@@ -126,13 +124,30 @@ SELECT
     h.name
 FROM submissions AS s
     JOIN challenges AS c
-    ON s.challenge_id = c.challenge_id
+     ON s.challenge_id = c.challenge_id
     JOIN difficulty AS d
-    ON c.difficulty_level = d.difficulty_level 
+     ON c.difficulty_level = d.difficulty_level 
     JOIN hackers AS h
-    ON s.hacker_id = h.hacker_id
+     ON s.hacker_id = h.hacker_id
 WHERE c.difficulty_level = d.difficulty_level  
     AND s.score = d.score 
 GROUP BY h.hacker_id, h.name
 HAVING COUNT(*) > 1
 ORDER BY COUNT(*) DESC, h.hacker_id ASC;
+
+/* 
+4. Write a query to output the names of those students whose best friends got offered a higher salary than them. 
+Names must be ordered by the salary amount offered to the best friends. 
+It is guaranteed that no two students got same salary offer.
+*/
+
+SELECT s.name
+FROM Students AS s
+    JOIN Friends AS f
+        ON s.ID = f.ID
+    JOIN Packages AS p1
+        ON s.ID=p1.ID
+    JOIN Packages AS p2
+        ON f.Friend_ID = p2.ID
+WHERE p1.Salary < p2.Salary
+ORDER BY p2.Salary;
